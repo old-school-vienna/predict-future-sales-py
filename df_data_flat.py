@@ -1,8 +1,11 @@
 import itertools
+from dataclasses import dataclass
 from typing import Dict
 
+import numpy as np
 import pandas as pd
 from sklearn import preprocessing
+from sklearn.preprocessing import MinMaxScaler
 
 import helpers as hlp
 
@@ -23,10 +26,16 @@ _vars = ['cat_30', 'cat_37', 'cat_40', 'cat_41', 'cat_43', 'cat_55', 'cat_57', '
          'cnt_item1', 'cnt_item2', 'cnt_item3', 'cnt_item_3m']
 
 
-def read_predictors():
+@dataclass
+class Trainset:
+    x: np.array
+    y: np.array
+    y_min_max_scaler: MinMaxScaler
+
+
+def read_train_data() -> Trainset:
     """
-    length of data is 891
-    cnt contains the truth.
+    :returns A trainset containing the data for training and cross validation
     """
     cat_dict = category_dict()
 
@@ -50,22 +59,20 @@ def read_predictors():
     df = df.drop(['month_nr'], axis=1)
     df['data'] = df['data'].apply(lambda l: list(itertools.chain.from_iterable(l)))
 
-    df_truth = read_truth()
-    df = pd.merge(df, df_truth, left_index=True, right_index=True)
+    y: np.array = read_truth()
 
-    df_data = list_to_columns(df, 'data', 891, 'cnt')
+    x = list_to_columns(df, 'data')
 
-    df = df.merge(df_data, left_index=True, right_index=True)
-    df = df.drop(['data'], axis=1)
+    x_min_max_scaler = preprocessing.MinMaxScaler()
+    x_scaled = x_min_max_scaler.fit_transform(x)
 
-    min_max_scaler = preprocessing.MinMaxScaler()
-    x_scaled = min_max_scaler.fit_transform(df.values)
-    df = pd.DataFrame(x_scaled)
+    y_min_max_scaler = preprocessing.MinMaxScaler()
+    y_scaled = y_min_max_scaler.fit_transform(y)
 
-    print("-- keys", df.keys())
-    print("-- data", df)
+    return Trainset(x_scaled, y_scaled, y_min_max_scaler)
 
-def read_truth() -> pd.DataFrame:
+
+def read_truth() -> np.array:
     file_name = hlp.dd() / "df_train.csv"
     df_train = pd.read_csv(file_name)
     df = df_train.fillna(value=0.0)
@@ -76,7 +83,7 @@ def read_truth() -> pd.DataFrame:
                   'cnt4', 'cnt5', 'cnt6', 'cnt_3m', 'cnt_6m', 'cnt_shop1', 'cnt_shop2',
                   'cnt_shop3', 'cnt_shop_3m', 'cnt_item1', 'cnt_item2', 'cnt_item3',
                   'cnt_item_3m'], axis=1)
-    return df
+    return df.values
 
 
 # noinspection PyTypeChecker
@@ -87,14 +94,13 @@ def category_dict() -> Dict[int, int]:
     return pd.Series(df.item_category_id.values, index=df.item_id).to_dict()
 
 
-def list_to_columns(df: pd.DataFrame, list_col_name: str, count_list_items: int, prefix: str) -> pd.DataFrame:
-    vns = [f"{prefix}_{i:03}" for i in range(count_list_items)]
+def list_to_columns(df: pd.DataFrame, list_col_name: str) -> np.array:
     df2 = df.copy()
     df2 = df2[[list_col_name]]
-    df2[vns] = pd.DataFrame(df2[list_col_name].tolist(), index= df2.index)
-    df2 = df2.drop([list_col_name], axis=1)
-    return df2
+    return df2[list_col_name].tolist()
 
 
-read_predictors()
-# read_truth()
+if __name__ == '__main__':
+    tset = read_train_data()
+    print("-- x", type(tset.x), tset.x.shape)
+    print("-- y", type(tset.y), tset.y.shape)

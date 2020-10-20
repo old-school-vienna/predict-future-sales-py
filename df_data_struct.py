@@ -45,10 +45,10 @@ def read_train_data() -> hlp.Trainset:
 
     df_p = predictors()
     df_t = truth()
-    df_p = df_t.merge(df_p, how='outer', on=['shop_id', 'item_id'])
+    df_t = df_p.merge(df_t, how='outer', on=['shop_id', 'item_id'])
 
     x: np.array = df_p.values
-    y: np.array = df_p[['truth']].values
+    y: np.array = df_t[['truth']].values
 
     x_min_max_scaler = preprocessing.MinMaxScaler()
     x_scaled = x_min_max_scaler.fit_transform(x)

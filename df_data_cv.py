@@ -7,12 +7,8 @@ import tensorflow.python.keras.activations as kerasa
 import tensorflow.python.keras.layers as kerasl
 
 import df_data_flat as dat
-#import df_data_struct as dat
+# import df_data_struct as dat
 import helpers as hlp
-
-td = dat.read_train_data()
-print("-- td x shape", td.x.shape)
-print("-- td y shape", td.y.shape)
 
 """
 flat: 891, 400
@@ -24,14 +20,12 @@ model.compile(optimizer="adam", loss="mean_squared_error")
 @dataclass
 class DeepModel:
     id: str
-    desc: str
     create_lambda: typing.Callable
 
 
 @dataclass
 class Training:
     id: str
-    desc: str
     batch_size: int
     deepModel: DeepModel
 
@@ -49,9 +43,8 @@ class ModelConfig:
     layers: typing.List[LayerConfig]
 
 
-def _create_model(model_config: ModelConfig):
+def _create_model(model_config: ModelConfig, input_size: int):
     model = keras.Sequential()
-    input_size = td.x.shape[0]
     model.add(kerasl.Dense(input_size, activation=model_config.activation))
     for l in model_config.layers:
         model.add(kerasl.Dense(int(l.size_relative * input_size), activation=model_config.activation))
@@ -60,7 +53,7 @@ def _create_model(model_config: ModelConfig):
     return model
 
 
-def plot_loss_during_training(training: Training):
+def plot_loss_during_training(training: Training, td: hlp.Trainset):
     plt.clf()
     pos = [1, 1, 1]
     plt.subplot(*pos)
@@ -81,8 +74,8 @@ def plot_loss_during_training(training: Training):
     fnam = hlp.dd() / f"train_{training.id}_{training.deepModel.id}.svg"
     plt.savefig(fnam, format='svg')
     print("---")
-    print(f"- running training {training.id}: {training.desc}")
-    print(f"- with model {training.deepModel.id}: {training.deepModel.desc}")
+    print(f"- running training {training.id}")
+    print(f"- with model {training.deepModel.id}")
     print("--- saved to", fnam)
 
 
@@ -91,32 +84,25 @@ def mc(act: str, ls: typing.List[float]) -> ModelConfig:
     return ModelConfig(activation=act, optimizer='adam', loss='mean_squared_error', layers=l1)
 
 
-def train():
+def train(td: hlp.Trainset):
+    input_size = td.x.shape[1]
 
-    sm0 = DeepModel('sig0', 'No intermediate layer with sigmoid activation', lambda: _create_model(mc(kerasa.sigmoid, [])))
-    rm0 = DeepModel('relu0', 'No intermediate layer with relu activation', lambda: _create_model(mc(kerasa.relu, [])))
-    tm0 = DeepModel('tanh0', 'No intermediate layer with tanh activation', lambda: _create_model(mc(kerasa.tanh, [])))
+    batch_sizes = [10, 20, 30]
+    layers_list = [[], [0.5], [0.5, 0.3]]
+    activations = [kerasa.sigmoid, kerasa.tanh, kerasa.relu]
 
-    sm1 = DeepModel('sig1', 'One intermediate layer with sigmoid activation', lambda: _create_model(mc(kerasa.sigmoid, [0.5])))
-    rm1 = DeepModel('relu1', 'One intermediate layer with relu activation', lambda: _create_model(mc(kerasa.sigmoid, [0.5])))
-    tm1 = DeepModel('tanh1', 'One intermediate layer with tanh activation', lambda: _create_model(mc(kerasa.sigmoid, [0.5])))
-
-    bss = [10, 20, 30]
-
-    st0 = [Training(id=f'bs{bs}', desc=f'Batchsize {bs}', batch_size=bs, deepModel=sm0) for bs in bss]
-    rt0 = [Training(id=f'bs{bs}', desc=f'Batchsize {bs}', batch_size=bs, deepModel=rm0) for bs in bss]
-    tt0 = [Training(id=f'bs{bs}', desc=f'Batchsize {bs}', batch_size=bs, deepModel=tm0) for bs in bss]
-
-    st1 = [Training(id=f'bs{bs}', desc=f'Batchsize {bs}', batch_size=bs, deepModel=sm1) for bs in bss]
-    rt1 = [Training(id=f'bs{bs}', desc=f'Batchsize {bs}', batch_size=bs, deepModel=rm1) for bs in bss]
-    tt1 = [Training(id=f'bs{bs}', desc=f'Batchsize {bs}', batch_size=bs, deepModel=tm1) for bs in bss]
-
-    trainings = st1 + rt1 + tt1 + st0 + rt0 + tt0
-    for t in trainings:
-        print(t)
-    for t in trainings:
-        plot_loss_during_training(t)
+    for batch_size in batch_sizes:
+        for layers in layers_list:
+            for activation in activations:
+                complexity = len(layers)
+                model_config = mc(activation, layers)
+                model = DeepModel(f'{activation}_{complexity}', lambda: _create_model(model_config, input_size))
+                training = Training(id=f'bs{batch_size}', batch_size=batch_size, deepModel=model)
+                plot_loss_during_training(training, td)
 
 
 if __name__ == '__main__':
-    train()
+    trainset = dat.read_train_data()
+    print("-- td x shape", trainset.x.shape)
+    print("-- td y shape", trainset.y.shape)
+    train(trainset)

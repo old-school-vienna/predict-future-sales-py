@@ -1,11 +1,8 @@
 import itertools
-from dataclasses import dataclass
-from typing import Dict
 
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
-from sklearn.preprocessing import MinMaxScaler
 
 import helpers as hlp
 
@@ -26,42 +23,51 @@ _vars = ['cat_30', 'cat_37', 'cat_40', 'cat_41', 'cat_43', 'cat_55', 'cat_57', '
          'cnt_item1', 'cnt_item2', 'cnt_item3', 'cnt_item_3m']
 
 
-@dataclass
-class Trainset:
-    x: np.array
-    y: np.array
-    y_min_max_scaler: MinMaxScaler
-
-
-def read_train_data() -> Trainset:
+def read_train_data() -> hlp.Trainset:
     """
     :returns A trainset containing the data for training and cross validation
     """
-    cat_dict = category_dict()
+    cat_dict = hlp.category_dict()
+    df_base = hlp.read_train_fillna()
 
-    file_name = hlp.dd() / "df_train.csv"
-    df_train = pd.read_csv(file_name)
-    df = df_train.fillna(value=0.0)
+    def read_truth() -> np.array:
+        df = df_base.copy()
 
-    df = df[df['month_nr'] < 33]
+        df = df[df['month_nr'] == 33]
+        df = df.groupby(by=['shop_id', 'item_id']).sum()
+        df = df.drop(['month_nr', 'cnt_shop', 'cnt_item', 'cnt1', 'cnt2', 'cnt3',
+                      'cnt4', 'cnt5', 'cnt6', 'cnt_3m', 'cnt_6m', 'cnt_shop1', 'cnt_shop2',
+                      'cnt_shop3', 'cnt_shop_3m', 'cnt_item1', 'cnt_item2', 'cnt_item3',
+                      'cnt_item_3m'], axis=1)
+        return df.values
 
-    df['cat'] = df['shop_id'].map(cat_dict)
-    cats = df['cat']
-    dummy_cats = pd.get_dummies(cats, prefix="cat")
-    df = dummy_cats.join(df)
+    def columns_to_list(df_in: pd.DataFrame, list_col_name: str) -> np.array:
+        df = df_in.copy()
+        df = df[[list_col_name]]
+        return df[list_col_name].tolist()
 
-    df = df.drop(['cat'], axis=1)
-    li = df[_vars].to_numpy().tolist()
-    df = df.assign(data=li)
-    df = df.drop(_vars, axis=1)
+    def predictors() -> pd.DataFrame:
+        df = df_base.copy()
+        df = df[df['month_nr'] < 33]
 
-    df = df.groupby(['shop_id', 'item_id']).agg(list)
-    df = df.drop(['month_nr'], axis=1)
-    df['data'] = df['data'].apply(lambda l: list(itertools.chain.from_iterable(l)))
+        df['cat'] = df['shop_id'].map(cat_dict)
+        cats = df['cat']
+        dummy_cats = pd.get_dummies(cats, prefix="cat")
+        df = dummy_cats.join(df)
 
+        df = df.drop(['cat'], axis=1)
+        li = df[_vars].to_numpy().tolist()
+        df = df.assign(data=li)
+        df = df.drop(_vars, axis=1)
+
+        df = df.groupby(['shop_id', 'item_id']).agg(list)
+        df = df.drop(['month_nr'], axis=1)
+        df['data'] = df['data'].apply(lambda l: list(itertools.chain.from_iterable(l)))
+        return df
+
+    df1 = predictors()
     y: np.array = read_truth()
-
-    x = list_to_columns(df, 'data')
+    x: np.array = columns_to_list(df1, 'data')
 
     x_min_max_scaler = preprocessing.MinMaxScaler()
     x_scaled = x_min_max_scaler.fit_transform(x)
@@ -69,35 +75,7 @@ def read_train_data() -> Trainset:
     y_min_max_scaler = preprocessing.MinMaxScaler()
     y_scaled = y_min_max_scaler.fit_transform(y)
 
-    return Trainset(x_scaled, y_scaled, y_min_max_scaler)
-
-
-def read_truth() -> np.array:
-    file_name = hlp.dd() / "df_train.csv"
-    df_train = pd.read_csv(file_name)
-    df = df_train.fillna(value=0.0)
-
-    df = df[df['month_nr'] == 33]
-    df = df.groupby(by=['shop_id', 'item_id']).sum()
-    df = df.drop(['month_nr', 'cnt_shop', 'cnt_item', 'cnt1', 'cnt2', 'cnt3',
-                  'cnt4', 'cnt5', 'cnt6', 'cnt_3m', 'cnt_6m', 'cnt_shop1', 'cnt_shop2',
-                  'cnt_shop3', 'cnt_shop_3m', 'cnt_item1', 'cnt_item2', 'cnt_item3',
-                  'cnt_item_3m'], axis=1)
-    return df.values
-
-
-# noinspection PyTypeChecker
-def category_dict() -> Dict[int, int]:
-    file_name = hlp.dd() / "items.csv"
-    df = pd.read_csv(file_name)
-    df = df[['item_id', 'item_category_id']]
-    return pd.Series(df.item_category_id.values, index=df.item_id).to_dict()
-
-
-def list_to_columns(df: pd.DataFrame, list_col_name: str) -> np.array:
-    df2 = df.copy()
-    df2 = df2[[list_col_name]]
-    return df2[list_col_name].tolist()
+    return hlp.Trainset('flat', x_scaled, y_scaled, y_min_max_scaler)
 
 
 if __name__ == '__main__':

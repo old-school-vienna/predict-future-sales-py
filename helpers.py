@@ -11,6 +11,7 @@ from sklearn.preprocessing import MinMaxScaler
 
 @dataclass
 class Trainset:
+    id: str
     x: np.array
     y: np.array
     y_min_max_scaler: MinMaxScaler

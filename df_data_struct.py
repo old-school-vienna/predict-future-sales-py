@@ -56,7 +56,7 @@ def read_train_data() -> hlp.Trainset:
     y_min_max_scaler = preprocessing.MinMaxScaler()
     y_scaled = y_min_max_scaler.fit_transform(y)
 
-    return hlp.Trainset(x_scaled, y_scaled, y_min_max_scaler)
+    return hlp.Trainset('struct', x_scaled, y_scaled, y_min_max_scaler)
 
 
 if __name__ == '__main__':

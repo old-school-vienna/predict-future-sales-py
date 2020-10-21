@@ -26,7 +26,9 @@ class DeepModel:
 class Training:
     id: str
     batch_size: int
+    epochs: int
     deepModel: DeepModel
+    trainset: hlp.Trainset
 
 
 @dataclass
@@ -52,7 +54,7 @@ def _create_model(model_config: ModelConfig, input_size: int):
     return model
 
 
-def plot_loss_during_training(training: Training, trainset: hlp.Trainset):
+def plot_loss_during_training(training: Training):
     plt.clf()
     pos = [1, 1, 1]
     plt.subplot(*pos)
@@ -60,22 +62,23 @@ def plot_loss_during_training(training: Training, trainset: hlp.Trainset):
 
     def fit_plot(batch_size: int):
         model = training.deepModel.create_lambda()
-        hist = model.fit(trainset.x, trainset.y, epochs=4, batch_size=batch_size)
+        hist = model.fit(training.trainset.x, training.trainset.y, epochs=training.epochs, batch_size=batch_size)
         plt.plot(hist.history['loss'])
 
     [fit_plot(e) for e in batch_sizes]
     # plt.legend([str(e) for e in batch_sizes], title='batch size')
     plt.yscale('log')
     plt.ylim(0.00001, 0.1)
-    plt.title(f'training:{training.id} model:{training.deepModel.id} batchsize:{training.batch_size}')
+    plt.title(f'trainset:{training.trainset.id} training:{training.id} model:{training.deepModel.id}')
     plt.ylabel('loss')
     plt.xlabel('epoch')
-    fnam = hlp.dd() / f"train_{trainset.id}_{training.id}_{training.deepModel.id}.svg"
+    plt.xticks(range(0, training.epochs + 1, int(float(training.epochs + 1) / 10.0)))
+    fnam = hlp.dd() / f"train_{training.trainset.id}_{training.id}_{training.deepModel.id}.svg"
     plt.savefig(fnam, format='svg')
     print("---")
     print(f"- running training {training.id}")
     print(f"- with model {training.deepModel.id}")
-    print(f"- on trainset {trainset.id}")
+    print(f"- on trainset {training.trainset.id}")
     print("--- saved to", fnam)
 
 
@@ -84,25 +87,32 @@ def mc(act: str, ls: typing.List[float]) -> ModelConfig:
     return ModelConfig(activation=act, optimizer='adam', loss='mean_squared_error', layers=l1)
 
 
-def train(trainset: hlp.Trainset):
-    input_size = trainset.x.shape[1]
-
-    batch_sizes = [10, 20, 30]
-    layers_list = [[], [0.5], [0.5, 0.3]]
-    activations = ["sigmoid", "tanh", "relu"]
+def train():
+    epochs = 40
+    # int values smaller 32
+    batch_sizes = [10]
+    # list of lists of relative number of nodes for intermediate layers
+    # [] .. No intermediate layer
+    # [0.5] .. One intermediate layers with 50% of nodes of the input layer
+    # Output layer has always one node
+    layers_list = [[], [0.5], [0.6, 0.3], [0.7, 0.5, 0.2]]
+    # Possible values: 'relu', 'sigmoid', 'tanh', 'softmax', ...
+    activations = ["relu"]
+    # Possible values fdat.read_train_data(), sdat.read_train_data()
+    trainsets = [fdat.read_train_data()]
 
     for batch_size in batch_sizes:
         for layers in layers_list:
             for activation in activations:
-                complexity = len(layers)
-                model_config = mc(activation, layers)
-                model = DeepModel(f'{activation}_{complexity}', lambda: _create_model(model_config, input_size))
-                training = Training(id=f'bs{batch_size}', batch_size=batch_size, deepModel=model)
-                plot_loss_during_training(training, trainset)
+                for ts in trainsets:
+                    complexity = len(layers)
+                    model_config = mc(activation, layers)
+                    input_size = ts.x.shape[1]
+                    model = DeepModel(f'{activation}_{complexity}', lambda: _create_model(model_config, input_size))
+                    training = Training(id=f'bs{batch_size}', batch_size=batch_size,
+                                        deepModel=model, epochs=epochs, trainset=ts)
+                    plot_loss_during_training(training=training)
 
 
 if __name__ == '__main__':
-    ts = fdat.read_train_data()
-    print("-- td x shape", ts.id, ts.x.shape)
-    print("-- td y shape", ts.id, ts.y.shape)
-    train(ts)
+    train()

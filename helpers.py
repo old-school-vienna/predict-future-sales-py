@@ -1,4 +1,5 @@
 import os
+import typing
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -6,6 +7,8 @@ from typing import List, Dict
 
 import numpy as np
 import pandas as pd
+import tensorflow.python.keras as keras
+import tensorflow.python.keras.layers as kerasl
 from sklearn.preprocessing import MinMaxScaler
 
 
@@ -42,14 +45,37 @@ def to_ds(date: str) -> int:
 
 
 def read_train_fillna() -> pd.DataFrame:
-    file_name = dd() / "df_train.csv"
+    file_name = dd() / 'in' / "df_train.csv"
     df_train = pd.read_csv(file_name)
     return df_train.fillna(value=0.0)
 
 
 # noinspection PyTypeChecker
 def category_dict() -> Dict[int, int]:
-    file_name = dd() / "items.csv"
+    file_name = dd() / 'in' / "items.csv"
     df = pd.read_csv(file_name)
     df = df[['item_id', 'item_category_id']]
     return pd.Series(df.item_category_id.values, index=df.item_id).to_dict()
+
+
+@dataclass
+class LayerConfig:
+    size_relative: float
+
+
+@dataclass
+class ModelConfig:
+    activation: str
+    optimizer: str
+    loss: str
+    layers: typing.List[LayerConfig]
+
+
+def create_model(model_config: ModelConfig, input_size: int):
+    model = keras.Sequential()
+    model.add(kerasl.Dense(input_size, activation=model_config.activation))
+    for layer in model_config.layers:
+        model.add(kerasl.Dense(int(layer.size_relative * input_size), activation=model_config.activation))
+    model.add(kerasl.Dense(1))
+    model.compile(optimizer=model_config.optimizer, loss=model_config.loss)
+    return model

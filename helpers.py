@@ -20,6 +20,14 @@ class Trainset:
     y_min_max_scaler: MinMaxScaler
 
 
+@dataclass
+class Trainset1:
+    id: str
+    x: pd.DataFrame
+    y: pd.DataFrame
+    y_min_max_scaler: MinMaxScaler
+
+
 def pivot(df: pd.DataFrame, grp_vars: List[str], col: str, val: str) -> pd.DataFrame:
     grpd = df.groupby(grp_vars).first()
     return grpd.pivot_table(index=grp_vars, columns=col, values=val, fill_value=0.0)

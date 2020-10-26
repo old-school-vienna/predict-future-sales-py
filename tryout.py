@@ -1,24 +1,49 @@
 import helpers as hlp
 
-import df_data_struct as sdf
 
-cat_dict = hlp.category_dict()
-df_base = hlp.read_train_fillna()
+def analyse():
+    """
+    read the struct dataset and visualize the existing months_nr
+    :return: Nothing
+    """
+    import df_data_struct as sdf
 
-df_p = sdf.predictors(df_base, cat_dict)
+    cat_dict = hlp.category_dict()
+    df_base = hlp.read_train_fillna()
 
-print(df_p.keys())
-df_t = sdf.truth(df_base)
+    df_p = sdf.predictors(df_base, cat_dict)
 
-p = df_p[['shop_id', 'item_id', 'cnt', 'mnr_0', 'mnr_1', 'mnr_2', 'mnr_3', 'mnr_4']]
+    print(df_p.keys())
+    df_t = sdf.truth(df_base)
 
-x = p.join(df_t, on=['shop_id', 'item_id'])
-x = x[x.truth > 10]
+    p = df_p[['shop_id', 'item_id', 'cnt', 'mnr_0', 'mnr_1', 'mnr_2', 'mnr_3', 'mnr_4', 'mnr_30', 'mnr_31', 'mnr_32']]
 
-x.sort_values(by=['shop_id', 'item_id'])
+    x = p.join(df_t, on=['shop_id', 'item_id'])
+    x = x[x.truth > 10]
 
-fnam = hlp.dd() / 'train.csv'
-x.to_csv(fnam, index=False)
-print("wrote to", fnam)
+    x.sort_values(by=['shop_id', 'item_id'])
 
-print(x)
+    fnam = hlp.dd() / 'train.csv'
+    x.to_csv(fnam, index=False)
+    print("wrote to", fnam)
+
+    print(x)
+
+
+def next_dat():
+    """
+    Create the next dataset
+    :return: None
+    """
+    import df_data_next as ndat
+
+    td = ndat.read_train_data()
+
+    print(td.x)
+    print(td.y)
+
+    print("-----------------------------------")
+
+
+if __name__ == '__main__':
+    next_dat()

@@ -15,16 +15,8 @@ from sklearn.preprocessing import MinMaxScaler
 @dataclass
 class Trainset:
     id: str
-    x: np.array
-    y: np.array
-    y_min_max_scaler: MinMaxScaler
-
-
-@dataclass
-class Trainset1:
-    id: str
-    x: pd.DataFrame
-    y: pd.DataFrame
+    x: typing.Any  # Array like e.g np.array. pd.DataFrame. ...
+    y: typing.Any  # Array like
     y_min_max_scaler: MinMaxScaler
 
 

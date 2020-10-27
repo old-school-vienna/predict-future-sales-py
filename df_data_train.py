@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import matplotlib.pyplot as plt
 
 import df_data_flat as fdat
+import df_data_next as ndat
 import helpers as hlp
 
 """
@@ -59,16 +60,16 @@ def plot_loss_during_training(training: Training):
 def train():
     epochs = 40
     # int values smaller 32
-    batch_sizes = [10]
+    batch_sizes = [10, 5]
     # list of lists of relative number of nodes for intermediate layers
     # [] .. No intermediate layer
     # [0.5] .. One intermediate layers with 50% of nodes of the input layer
     # Output layer has always one node
-    layers_list = [[], [0.5], [0.6, 0.3], [0.7, 0.5, 0.2]]
+    layers_list = [[1.0], [1.0, 1.0, 1.0],  [1.0, 1.0, 1.0, 1.0, 1.0] ]
     # Possible values: 'relu', 'sigmoid', 'tanh', 'softmax', ...
     activations = ["relu"]
     # Possible values fdat.read_train_data(), sdat.read_train_data()
-    trainsets = [fdat.read_train_data()]
+    trainsets = [ndat.read_train_data()]
 
     for batch_size in batch_sizes:
         for layers in layers_list:

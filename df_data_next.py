@@ -1,14 +1,10 @@
+from dataclasses import dataclass
+from typing import List
+
 import pandas as pd
 from sklearn import preprocessing
 
 import helpers as hlp
-
-"""
-Info:
-Columns used by karl
-c("cnt1", "cnt5", "cnt_3m", "cnt_6m", "cnt2", "cnt_item_3m", "cnt_item1", "qtr", "cnt6", "cnt3", "item_category_id", "cnt_shop_3m")
-
-"""
 
 
 def predictors(df_base: pd.DataFrame, cat_dict: dict) -> pd.DataFrame:
@@ -29,7 +25,7 @@ def predictors(df_base: pd.DataFrame, cat_dict: dict) -> pd.DataFrame:
     return df
 
 
-def read_train_data() -> hlp.Trainset1:
+def read_train_data() -> hlp.Trainset:
     """
     :returns A trainset containing the data for training and cross validation
     """
@@ -47,4 +43,4 @@ def read_train_data() -> hlp.Trainset1:
     y_min_max_scaler = preprocessing.MinMaxScaler()
     y_scaled = pd.DataFrame(y_min_max_scaler.fit_transform(df_y), columns=df_y.columns)
 
-    return hlp.Trainset1('struct', x_scaled, y_scaled, y_min_max_scaler)
+    return hlp.Trainset('next', x_scaled, y_scaled, y_min_max_scaler)

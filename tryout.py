@@ -39,8 +39,8 @@ def next_dat():
 
     td = ndat.read_train_data()
 
-    print(td.x)
-    print(td.y)
+    print(td.x.shape)
+    print(td.y.shape)
 
     print("-----------------------------------")
 

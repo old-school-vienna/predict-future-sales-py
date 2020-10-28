@@ -108,5 +108,5 @@ def train(train_id: str, train_config: TrainConfig):
 
 
 if __name__ == '__main__':
-    tid = 'tryout'
+    tid = 'next01'
     train(tid, train_config=configs[tid])

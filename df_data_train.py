@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 import matplotlib.pyplot as plt
 
-import df_data_flat as fdat
 import df_data_next as ndat
 import helpers as hlp
 
@@ -57,34 +56,57 @@ def plot_loss_during_training(training: Training):
     print("--- saved to", fnam)
 
 
-def train():
-    epochs = 40
+@dataclass
+class TrainConfig:
+    epochs: int
     # int values smaller 32
-    batch_sizes = [10, 5]
+    batch_sizes: typing.List[int]
     # list of lists of relative number of nodes for intermediate layers
     # [] .. No intermediate layer
     # [0.5] .. One intermediate layers with 50% of nodes of the input layer
     # Output layer has always one node
-    layers_list = [[1.0], [1.0, 1.0, 1.0],  [1.0, 1.0, 1.0, 1.0, 1.0] ]
+    layers_list: typing.List[typing.List[float]]
     # Possible values: 'relu', 'sigmoid', 'tanh', 'softmax', ...
-    activations = ["relu"]
-    # Possible values fdat.read_train_data(), sdat.read_train_data()
-    trainsets = [ndat.read_train_data()]
+    activations: typing.List[str]
+    # Possible values fdat.read_train_data, sdat.read_train_data
+    trainsets: typing.List[typing.Callable[[], hlp.Trainset]]
 
-    for batch_size in batch_sizes:
-        for layers in layers_list:
-            for activation in activations:
-                for ts in trainsets:
+
+configs = {
+    'next01': TrainConfig(
+        epochs=40,
+        batch_sizes=[10, 5],
+        layers_list=[[1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0, 1.0]],
+        activations=["relu"],
+        trainsets=[ndat.read_train_data],
+    ),
+    'tryout': TrainConfig(
+        epochs=10,
+        batch_sizes=[5],
+        layers_list=[[1.0]],
+        activations=["relu"],
+        trainsets=[ndat.read_train_data]
+    )
+}
+
+
+def train(train_id: str, train_config: TrainConfig):
+    for batch_size in train_config.batch_sizes:
+        for layers in train_config.layers_list:
+            for activation in train_config.activations:
+                for creator in train_config.trainsets:
+                    ts = creator()
                     complexity = len(layers)
                     layer_configs = [hlp.LayerConfig(size) for size in layers]
                     model_config = hlp.ModelConfig(activation=activation, optimizer='adam',
                                                    loss='mean_squared_error', layers=layer_configs)
                     input_size = ts.x.shape[1]
                     model = DeepModel(f'{activation}_{complexity}', lambda: hlp.create_model(model_config, input_size))
-                    training = Training(id=f'bs{batch_size}', batch_size=batch_size,
-                                        deepModel=model, epochs=epochs, trainset=ts)
+                    training = Training(id=f'{train_id}_bs{batch_size}', batch_size=batch_size,
+                                        deepModel=model, epochs=train_config.epochs, trainset=ts)
                     plot_loss_during_training(training=training)
 
 
 if __name__ == '__main__':
-    train()
+    tid = 'tryout'
+    train(tid, train_config=configs[tid])

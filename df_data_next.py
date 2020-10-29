@@ -1,10 +1,24 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 import pandas as pd
 from sklearn import preprocessing
 
 import helpers as hlp
+
+
+@dataclass
+class NextConfig:
+    id: str
+    predictor_names: Optional[List[str]]
+
+
+configs = {
+    'all': NextConfig(id='all', predictor_names=None),
+    'L': NextConfig(id='L', predictor_names=["cnt1", "cnt_6m", "cnt5", "cnt6", "cnt_3m", "cnt3", "cnt4"]),
+    'M': NextConfig(id='M', predictor_names=["cnt1", "cnt_6m", "cnt5", "cnt6", "cnt_3m"]),
+    'S': NextConfig(id='S', predictor_names=["cnt1", "cnt_6m", "cnt5", "cnt6"]),
+}
 
 
 def predictors(df_base: pd.DataFrame, cat_dict: dict) -> pd.DataFrame:
@@ -25,7 +39,7 @@ def predictors(df_base: pd.DataFrame, cat_dict: dict) -> pd.DataFrame:
     return df
 
 
-def read_train_data() -> hlp.Trainset:
+def _read_train_data(cfg: NextConfig) -> hlp.Trainset:
     """
     :returns A trainset containing the data for training and cross validation
     """
@@ -39,8 +53,26 @@ def read_train_data() -> hlp.Trainset:
 
     x_min_max_scaler = preprocessing.MinMaxScaler()
     x_scaled = pd.DataFrame(x_min_max_scaler.fit_transform(df_x), columns=df_x.columns)
+    if cfg.predictor_names is not None:
+        x_scaled = x_scaled[cfg.predictor_names]
 
     y_min_max_scaler = preprocessing.MinMaxScaler()
     y_scaled = pd.DataFrame(y_min_max_scaler.fit_transform(df_y), columns=df_y.columns)
 
-    return hlp.Trainset('next', x_scaled, y_scaled, y_min_max_scaler)
+    return hlp.Trainset(f'next_{cfg.id}', x_scaled, y_scaled, y_min_max_scaler)
+
+
+def read_train_data_all() -> hlp.Trainset:
+    return _read_train_data(configs['all'])
+
+
+def read_train_data_L() -> hlp.Trainset:
+    return _read_train_data(configs['L'])
+
+
+def read_train_data_M() -> hlp.Trainset:
+    return _read_train_data(configs['M'])
+
+
+def read_train_data_S() -> hlp.Trainset:
+    return _read_train_data(configs['S'])

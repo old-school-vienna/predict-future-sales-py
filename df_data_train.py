@@ -78,25 +78,35 @@ configs = {
         batch_sizes=[10, 5],
         layers_list=[[1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0, 1.0]],
         activations=["relu"],
-        trainsets=[ndat.read_train_data],
+        trainsets=[ndat.read_train_data_all],
+    ),
+    'next02': TrainConfig(
+        epochs=30,
+        batch_sizes=[10],
+        layers_list=[[1.0], [1.0, 1.0, 1.0]],
+        activations=["relu"],
+        trainsets=[ndat.read_train_data_M],
     ),
     'tryout': TrainConfig(
         epochs=10,
         batch_sizes=[5],
         layers_list=[[1.0]],
         activations=["relu"],
-        trainsets=[ndat.read_train_data]
+        trainsets=[ndat.read_train_data_all]
     )
 }
 
 
 def train(train_id: str, train_config: TrainConfig):
+    print("== running", train_id )
     for batch_size in train_config.batch_sizes:
         for layers in train_config.layers_list:
             for activation in train_config.activations:
                 for creator in train_config.trainsets:
                     ts = creator()
+                    print("-- Trainset", ts.id)
                     complexity = len(layers)
+                    print("-- NN", complexity)
                     layer_configs = [hlp.LayerConfig(size) for size in layers]
                     model_config = hlp.ModelConfig(activation=activation, optimizer='adam',
                                                    loss='mean_squared_error', layers=layer_configs)
@@ -108,5 +118,5 @@ def train(train_id: str, train_config: TrainConfig):
 
 
 if __name__ == '__main__':
-    tid = 'next01'
+    tid = 'next02'
     train(tid, train_config=configs[tid])

@@ -47,7 +47,7 @@ def plot_loss_during_training(training: Training):
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.xticks(range(0, training.epochs + 1, int(float(training.epochs + 1) / 10.0)))
-    fnam = hlp.dd() / f"train_{training.trainset.id}_{training.id}_{training.deepModel.id}.svg"
+    fnam = hlp.dd() / f"train_{training.id}_{training.trainset.id}_{training.deepModel.id}.svg"
     plt.savefig(fnam, format='svg')
     print("---")
     print(f"- running training {training.id}")
@@ -87,6 +87,13 @@ configs = {
         activations=["relu"],
         trainsets=[ndat.read_train_data_S, ndat.read_train_data_M, ndat.read_train_data_L, ndat.read_train_data_all],
     ),
+    'nextkarl01': TrainConfig(
+        epochs=30,
+        batch_sizes=[10],
+        layers_list=[[], [1.0], [1.0, 1.0], [1.0, 1.0, 1.0]],
+        activations=["relu"],
+        trainsets=[ndat.read_train_data_karl],
+    ),
     'tryout': TrainConfig(
         epochs=10,
         batch_sizes=[5],
@@ -118,5 +125,5 @@ def train(train_id: str, train_config: TrainConfig):
 
 
 if __name__ == '__main__':
-    tid = 'next02'
+    tid = 'nextkarl01'
     train(tid, train_config=configs[tid])

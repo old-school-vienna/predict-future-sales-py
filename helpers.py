@@ -94,3 +94,13 @@ def create_model(model_config: ModelConfig, input_size: int):
     model.add(kerasl.Dense(1))
     model.compile(optimizer=model_config.optimizer, loss=model_config.loss)
     return model
+
+
+def onehot(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    df_result = df.copy()
+    cats = df_result[column]
+    dummy_cats = pd.get_dummies(cats, prefix=column)
+    df_result = dummy_cats.join(df_result)
+    return df_result.drop([column], axis=1)
+
+

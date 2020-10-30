@@ -1,5 +1,7 @@
-import helpers as hlp
+import pandas as pd
+
 import df_data_next as ndat
+import helpers as hlp
 
 
 def analyse():
@@ -50,6 +52,16 @@ def next_all_keys():
     print(ndat.read_train_data_all().x.keys())
 
 
+def onehot():
+    data = {
+        'a': [1, 1, 1, 2, 2, 1],
+        'b': ['A', 'alles', '++', 'K', 'l', '___', ]
+    }
+    df = pd.DataFrame(data)
+    df1 = hlp.onehot(df, 'a')
+    df2 = hlp.onehot(df1, 'b')
+    print(df2)
+
+
 if __name__ == '__main__':
-    karl = ndat.read_train_data_karl_not_norm()
-    print(karl.x.keys())
+    onehot()

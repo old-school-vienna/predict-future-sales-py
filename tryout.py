@@ -64,4 +64,4 @@ def onehot():
 
 
 if __name__ == '__main__':
-    onehot()
+    hlp.price_dict()

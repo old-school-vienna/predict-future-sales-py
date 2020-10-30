@@ -65,6 +65,13 @@ def _read_train_fillna(qualifier: str) -> pd.DataFrame:
     return df_train.fillna(value=0.0)
 
 
+def price_dict() -> dict:
+    df = pd.read_csv(dd() / "in" / "sales_train.csv")
+    df = df[['shop_id', 'item_id', 'item_price']]
+    grp = df.groupby(['shop_id', 'item_id'])['item_price'].mean()
+    return dict(grp)
+
+
 # noinspection PyTypeChecker
 def category_dict() -> Dict[int, int]:
     file_name = dd() / 'in' / "items.csv"
@@ -102,5 +109,3 @@ def onehot(df: pd.DataFrame, column: str) -> pd.DataFrame:
     dummy_cats = pd.get_dummies(cats, prefix=column)
     df_result = dummy_cats.join(df_result)
     return df_result.drop([column], axis=1)
-
-

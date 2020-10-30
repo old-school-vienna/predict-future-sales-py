@@ -5,7 +5,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Dict
 
-import numpy as np
 import pandas as pd
 import tensorflow.python.keras as keras
 import tensorflow.python.keras.layers as kerasl
@@ -45,7 +44,23 @@ def to_ds(date: str) -> int:
 
 
 def read_train_fillna() -> pd.DataFrame:
-    file_name = dd() / 'in' / "df_train.csv"
+    return _read_train_fillna('')
+
+
+def read_train3_fillna() -> pd.DataFrame:
+    return _read_train_fillna('3')
+
+
+def read_train4_fillna() -> pd.DataFrame:
+    return _read_train_fillna('4')
+
+
+def read_trainx_fillna() -> pd.DataFrame:
+    return _read_train_fillna('x')
+
+
+def _read_train_fillna(qualifier: str) -> pd.DataFrame:
+    file_name = dd() / 'in' / f"df_train{qualifier}.csv"
     df_train = pd.read_csv(file_name)
     return df_train.fillna(value=0.0)
 

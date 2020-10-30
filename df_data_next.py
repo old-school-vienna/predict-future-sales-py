@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Callable
 
 import pandas as pd
 from sklearn import preprocessing
@@ -10,14 +10,27 @@ import helpers as hlp
 @dataclass
 class NextConfig:
     id: str
+    df_base: Callable[[], pd.DataFrame]
     predictor_names: Optional[List[str]]
 
 
 configs = {
-    'all': NextConfig(id='all', predictor_names=None),
-    'L': NextConfig(id='L', predictor_names=["cnt1", "cnt_6m", "cnt5", "cnt6", "cnt_3m", "cnt3", "cnt4"]),
-    'M': NextConfig(id='M', predictor_names=["cnt1", "cnt_6m", "cnt5", "cnt6", "cnt_3m"]),
-    'S': NextConfig(id='S', predictor_names=["cnt1", "cnt_6m", "cnt5", "cnt6"]),
+    'all': NextConfig(id='all', df_base=hlp.read_train_fillna,
+                      predictor_names=None),
+    'L': NextConfig(id='L', df_base=hlp.read_train_fillna,
+                    predictor_names=["cnt1", "cnt_6m", "cnt5", "cnt6", "cnt_3m", "cnt3", "cnt4"]),
+    'M': NextConfig(id='M', df_base=hlp.read_train_fillna,
+                    predictor_names=["cnt1", "cnt_6m", "cnt5", "cnt6", "cnt_3m"]),
+    'S': NextConfig(id='S', df_base=hlp.read_train_fillna,
+                    predictor_names=["cnt1", "cnt_6m", "cnt5", "cnt6"]),
+    'karl': NextConfig(id='karl', df_base=hlp.read_trainx_fillna,
+                       predictor_names=["cnt1", "cnt2", "cnt3", "cnt4", "cnt5", "cnt6", "cnt_3m", "cnt_6m",
+                                        "cnt_shop1", "cnt_shop_3m", "cnt_item1", "cnt_item_3m", "year",
+                                        'qtr_Q1', 'qtr_Q2', 'qtr_Q3', 'qtr_Q4', 'cat_30', 'cat_37', 'cat_40',
+                                        'cat_41', 'cat_43', 'cat_55', 'cat_57', 'cat_78', "shop_id",
+                                        # "price",
+                                        # "price_reduc",
+                                        ])
 }
 
 
@@ -36,6 +49,16 @@ def predictors(df_base: pd.DataFrame, cat_dict: dict) -> pd.DataFrame:
     df = dummy_month_nrs.join(df)
     df = df.drop(['month_nr'], axis=1)
 
+    month_group = df['monthgroup']
+    dummy_month_group = pd.get_dummies(month_group, prefix="mnr")
+    df = dummy_month_group.join(df)
+    df = df.drop(['monthgroup'], axis=1)
+
+    qtr_nrs = df['qtr']
+    dummy_qtr_nrs = pd.get_dummies(qtr_nrs, prefix="qtr")
+    df = dummy_qtr_nrs.join(df)
+    df = df.drop(['qtr'], axis=1)
+
     return df
 
 
@@ -44,7 +67,7 @@ def _read_train_data(cfg: NextConfig) -> hlp.Trainset:
     :returns A trainset containing the data for training and cross validation
     """
     cat_dict = hlp.category_dict()
-    df_base = hlp.read_train_fillna()
+    df_base = cfg.df_base()
 
     df_p = predictors(df_base, cat_dict)
 
@@ -76,3 +99,7 @@ def read_train_data_M() -> hlp.Trainset:
 
 def read_train_data_S() -> hlp.Trainset:
     return _read_train_data(configs['S'])
+
+
+def read_train_data_karl() -> hlp.Trainset:
+    return _read_train_data(configs['karl'])

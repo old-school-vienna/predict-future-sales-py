@@ -16,7 +16,7 @@ class Trainset:
     id: str
     x: typing.Any  # Array like e.g np.array. pd.DataFrame. ...
     y: typing.Any  # Array like
-    y_min_max_scaler: MinMaxScaler
+    y_min_max_scaler: typing.Optional[MinMaxScaler]
 
 
 def pivot(df: pd.DataFrame, grp_vars: List[str], col: str, val: str) -> pd.DataFrame:

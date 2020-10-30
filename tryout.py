@@ -51,5 +51,5 @@ def next_all_keys():
 
 
 if __name__ == '__main__':
-    karl = ndat.read_train_data_karl()
+    karl = ndat.read_train_data_karl_not_norm()
     print(karl.x.keys())

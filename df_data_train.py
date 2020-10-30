@@ -6,12 +6,6 @@ import matplotlib.pyplot as plt
 import df_data_next as ndat
 import helpers as hlp
 
-"""
-flat: 891, 400
-struct: 63, 40
-model.compile(optimizer="adam", loss="mean_squared_error")
-"""
-
 
 @dataclass
 class DeepModel:
@@ -85,7 +79,7 @@ configs = {
         batch_sizes=[10],
         layers_list=[[], [1.0], [1.0, 1.0, 1.0]],
         activations=["relu"],
-        trainsets=[ndat.read_train_data_S, ndat.read_train_data_M, ndat.read_train_data_L, ndat.read_train_data_all],
+        trainsets=[ndat.read_train_data_s, ndat.read_train_data_m, ndat.read_train_data_l, ndat.read_train_data_all],
     ),
     'nextkarl01': TrainConfig(
         epochs=30,
@@ -93,6 +87,13 @@ configs = {
         layers_list=[[], [1.0], [1.0, 1.0], [1.0, 1.0, 1.0]],
         activations=["relu"],
         trainsets=[ndat.read_train_data_karl],
+    ),
+    'nextkarl02': TrainConfig(
+        epochs=30,
+        batch_sizes=[10],
+        layers_list=[[], [1.0], [1.0, 1.0], [1.0, 1.0, 1.0]],
+        activations=["relu"],
+        trainsets=[ndat.read_train_data_karl_not_norm],
     ),
     'tryout': TrainConfig(
         epochs=10,
@@ -105,7 +106,7 @@ configs = {
 
 
 def train(train_id: str, train_config: TrainConfig):
-    print("== running", train_id )
+    print("== running", train_id)
     for batch_size in train_config.batch_sizes:
         for layers in train_config.layers_list:
             for activation in train_config.activations:
@@ -125,5 +126,5 @@ def train(train_id: str, train_config: TrainConfig):
 
 
 if __name__ == '__main__':
-    tid = 'nextkarl01'
+    tid = 'nextkarl02'
     train(tid, train_config=configs[tid])

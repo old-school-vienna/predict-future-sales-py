@@ -12,6 +12,7 @@ class NextConfig:
     id: str
     df_base: Callable[[], pd.DataFrame]
     predictor_names: Optional[List[str]]
+    normalized: bool = True
 
 
 configs = {
@@ -30,7 +31,16 @@ configs = {
                                         'cat_41', 'cat_43', 'cat_55', 'cat_57', 'cat_78', "shop_id",
                                         # "price",
                                         # "price_reduc",
-                                        ])
+                                        ]),
+    'karl_not_norm': NextConfig(id='karl_not_norm', df_base=hlp.read_trainx_fillna,
+                                predictor_names=["cnt1", "cnt2", "cnt3", "cnt4", "cnt5", "cnt6", "cnt_3m", "cnt_6m",
+                                                 "cnt_shop1", "cnt_shop_3m", "cnt_item1", "cnt_item_3m", "year",
+                                                 'qtr_Q1', 'qtr_Q2', 'qtr_Q3', 'qtr_Q4', 'cat_30', 'cat_37', 'cat_40',
+                                                 'cat_41', 'cat_43', 'cat_55', 'cat_57', 'cat_78', "shop_id",
+                                                 # "price",
+                                                 # "price_reduc",
+                                                 ],
+                                normalized=False)
 }
 
 
@@ -74,32 +84,39 @@ def _read_train_data(cfg: NextConfig) -> hlp.Trainset:
     df_x = df_p.drop(['cnt'], axis=1)
     df_y = df_p[['cnt']]
 
-    x_min_max_scaler = preprocessing.MinMaxScaler()
-    x_scaled = pd.DataFrame(x_min_max_scaler.fit_transform(df_x), columns=df_x.columns)
-    if cfg.predictor_names is not None:
-        x_scaled = x_scaled[cfg.predictor_names]
+    if cfg.normalized:
+        x_min_max_scaler = preprocessing.MinMaxScaler()
+        x_scaled = pd.DataFrame(x_min_max_scaler.fit_transform(df_x), columns=df_x.columns)
+        if cfg.predictor_names is not None:
+            x_scaled = x_scaled[cfg.predictor_names]
 
-    y_min_max_scaler = preprocessing.MinMaxScaler()
-    y_scaled = pd.DataFrame(y_min_max_scaler.fit_transform(df_y), columns=df_y.columns)
+        y_min_max_scaler = preprocessing.MinMaxScaler()
+        y_scaled = pd.DataFrame(y_min_max_scaler.fit_transform(df_y), columns=df_y.columns)
 
-    return hlp.Trainset(f'next_{cfg.id}', x_scaled, y_scaled, y_min_max_scaler)
+        return hlp.Trainset(f'next_{cfg.id}', x_scaled, y_scaled, y_min_max_scaler)
+    else:
+        return hlp.Trainset(f'next_{cfg.id}', df_x, df_y, None)
 
 
 def read_train_data_all() -> hlp.Trainset:
     return _read_train_data(configs['all'])
 
 
-def read_train_data_L() -> hlp.Trainset:
+def read_train_data_l() -> hlp.Trainset:
     return _read_train_data(configs['L'])
 
 
-def read_train_data_M() -> hlp.Trainset:
+def read_train_data_m() -> hlp.Trainset:
     return _read_train_data(configs['M'])
 
 
-def read_train_data_S() -> hlp.Trainset:
+def read_train_data_s() -> hlp.Trainset:
     return _read_train_data(configs['S'])
 
 
 def read_train_data_karl() -> hlp.Trainset:
     return _read_train_data(configs['karl'])
+
+
+def read_train_data_karl_not_norm() -> hlp.Trainset:
+    return _read_train_data(configs['karl_not_norm'])

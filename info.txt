@@ -1,6 +1,6 @@
 
 
-docker run -it -v /home/wwagner4/prj/predict-future-sales-py:/opt/project \
+docker run -it -v /home/wwagner4/prj/kaggle/predict-future-sales-py:/opt/project \
 -e DATADIR=/opt/project/data \
 -w /opt/project \
 predict-future-sales bash

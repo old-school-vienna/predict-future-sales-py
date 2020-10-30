@@ -1,4 +1,5 @@
 import helpers as hlp
+import df_data_next as ndat
 
 
 def analyse():
@@ -37,7 +38,7 @@ def next_dat():
     """
     import df_data_next as ndat
 
-    td = ndat.read_train_data()
+    td = ndat.read_train_data_all()
 
     print(td.x.shape)
     print(td.y.shape)
@@ -45,5 +46,9 @@ def next_dat():
     print("-----------------------------------")
 
 
+def next_all_keys():
+    print(ndat.read_train_data_all().x.keys())
+
+
 if __name__ == '__main__':
-    next_dat()
+    next_all_keys()

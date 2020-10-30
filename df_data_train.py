@@ -83,9 +83,9 @@ configs = {
     'next02': TrainConfig(
         epochs=30,
         batch_sizes=[10],
-        layers_list=[[1.0], [1.0, 1.0, 1.0]],
+        layers_list=[[], [1.0], [1.0, 1.0, 1.0]],
         activations=["relu"],
-        trainsets=[ndat.read_train_data_M],
+        trainsets=[ndat.read_train_data_S, ndat.read_train_data_M, ndat.read_train_data_L, ndat.read_train_data_all],
     ),
     'tryout': TrainConfig(
         epochs=10,

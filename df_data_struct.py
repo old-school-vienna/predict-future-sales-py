@@ -4,13 +4,6 @@ from sklearn import preprocessing
 
 import helpers as hlp
 
-"""
-Info:
-Columns used by karl
-c("cnt1", "cnt5", "cnt_3m", "cnt_6m", "cnt2", "cnt_item_3m", "cnt_item1", "qtr", "cnt6", "cnt3", "item_category_id", "cnt_shop_3m")
-
-"""
-
 
 def predictors(df_base: pd.DataFrame, cat_dict: dict) -> pd.DataFrame:
     df = df_base.copy()

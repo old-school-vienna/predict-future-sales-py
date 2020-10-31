@@ -1,5 +1,6 @@
 import pandas as pd
 
+import df_data_train_plot as tp
 import helpers as hlp
 
 
@@ -53,4 +54,4 @@ def filter1():
 
 
 if __name__ == '__main__':
-    filter1()
+    tp.plot()

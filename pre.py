@@ -4,17 +4,17 @@ import pandas as pd
 import helpers as hlp
 
 
-def add_dn(dd: Path):
-    df = pd.read_csv(dd / "sales_train.csv")
-    print(df)
+def add_dn(data_dir: Path):
+    data_file = pd.read_csv(data_dir / "sales_train.csv")
+    print(data_file)
 
-    df['dn'] = df.apply(lambda row: hlp.to_ds(row.date), axis=1)
-    print(df)
+    data_file['dn'] = data_file.apply(lambda row: hlp.to_ds(row.date), axis=1)
+    print(data_file)
 
     out_nam = "sales_train_dn.csv"
-    out_path = dd / out_nam
+    out_path = data_dir / out_nam
     print("-- writing to", out_path)
-    df.to_csv(out_path)
+    data_file.to_csv(out_path)
     print("-- wrote to", out_path)
 
 

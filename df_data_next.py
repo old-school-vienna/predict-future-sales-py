@@ -60,7 +60,6 @@ def _read_train_data(cfg: NextConfig) -> hlp.Trainset:
     df_x = df_x[predictor_names]
     df_y = df[['cnt']]
 
-
     if cfg.normalized:
         x_min_max_scaler = preprocessing.MinMaxScaler()
         x_scaled = pd.DataFrame(x_min_max_scaler.fit_transform(df_x), columns=df_x.columns)

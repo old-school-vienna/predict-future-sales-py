@@ -109,3 +109,13 @@ def onehot(df: pd.DataFrame, column: str) -> pd.DataFrame:
     dummy_cats = pd.get_dummies(cats, prefix=column)
     df_result = dummy_cats.join(df_result)
     return df_result.drop([column], axis=1)
+
+
+def filter_variables(variables: list, prefixes: list) -> list:
+    def cont(var) -> bool:
+        for v in prefixes:
+            if var.startswith(v):
+                return True
+        return False
+
+    return list(filter(lambda v: cont(v), variables))

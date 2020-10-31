@@ -1,6 +1,5 @@
 import pandas as pd
 
-import df_data_next as ndat
 import helpers as hlp
 
 
@@ -33,25 +32,6 @@ def analyse():
     print(x)
 
 
-def next_dat():
-    """
-    Create the next dataset
-    :return: None
-    """
-    import df_data_next as ndat
-
-    td = ndat.read_train_data_all()
-
-    print(td.x.shape)
-    print(td.y.shape)
-
-    print("-----------------------------------")
-
-
-def next_all_keys():
-    print(ndat.read_train_data_all().x.keys())
-
-
 def onehot():
     data = {
         'a': [1, 1, 1, 2, 2, 1],
@@ -63,5 +43,14 @@ def onehot():
     print(df2)
 
 
+def filter1():
+    a = ['a_23', 'a_2323', 'b', 'c', 'd', 'e_', 'f', ]
+    x = ['b']
+    y = ['c', 'f', 'a']
+    k = x + y
+    r = hlp.filter_variables(a, k)
+    print(r)
+
+
 if __name__ == '__main__':
-    hlp.price_dict()
+    filter1()

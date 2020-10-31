@@ -67,19 +67,12 @@ class TrainConfig:
 
 
 configs = {
-    'next01': TrainConfig(
-        epochs=40,
-        batch_sizes=[10, 5],
-        layers_list=[[1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0, 1.0]],
-        activations=["relu"],
-        trainsets=[ndat.read_train_data_all],
-    ),
     'next02': TrainConfig(
         epochs=30,
         batch_sizes=[10],
         layers_list=[[], [1.0], [1.0, 1.0, 1.0]],
         activations=["relu"],
-        trainsets=[ndat.read_train_data_s, ndat.read_train_data_m, ndat.read_train_data_l, ndat.read_train_data_all],
+        trainsets=[ndat.read_train_data_s, ndat.read_train_data_m, ndat.read_train_data_l],
     ),
     'nextkarl01': TrainConfig(
         epochs=30,
@@ -100,7 +93,7 @@ configs = {
         batch_sizes=[5],
         layers_list=[[1.0]],
         activations=["relu"],
-        trainsets=[ndat.read_train_data_all]
+        trainsets=[ndat.read_train_data_s]
     )
 }
 

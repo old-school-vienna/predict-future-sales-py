@@ -27,19 +27,13 @@ configs = {
                     categorical_predictors=['cat', 'month_nr'],
                     numeric_predictors=["cnt1", "cnt_6m", "cnt5", "cnt6"]),
     'karl': NextConfig(id='karl', df_base=hlp.read_trainx_fillna,
-                       categorical_predictors=['cat', 'month_nr', 'monthgroup', 'qrt'],
+                       categorical_predictors=['cat', 'month_nr', 'monthgroup', 'qtr'],
                        numeric_predictors=["cnt1", "cnt2", "cnt3", "cnt4", "cnt5", "cnt6", "cnt_3m", "cnt_6m",
-                                           "cnt_shop1", "cnt_shop_3m", "cnt_item1", "cnt_item_3m", "year"
-                                           # "price",
-                                           # "price_reduc",
-                                           ]),
+                                           "cnt_shop1", "cnt_shop_3m", "cnt_item1", "cnt_item_3m", "year", "price", ]),
     'karl_not_norm': NextConfig(id='karl_not_norm', df_base=hlp.read_trainx_fillna,
-                                categorical_predictors=['cat', 'month_nr', 'monthgroup', 'qrt', 'shop_id', 'year'],
+                                categorical_predictors=['cat', 'month_nr', 'monthgroup', 'qtr', 'shop_id', 'year'],
                                 numeric_predictors=["cnt1", "cnt2", "cnt3", "cnt4", "cnt5", "cnt6", "cnt_3m", "cnt_6m",
-                                                    "cnt_shop1", "cnt_shop_3m", "cnt_item1", "cnt_item_3m",
-                                                    # "price",
-                                                    # "price_reduc",
-                                                    ],
+                                                    "cnt_shop1", "cnt_shop_3m", "cnt_item1", "cnt_item_3m", "price", ],
                                 normalized=False)
 }
 
@@ -49,17 +43,23 @@ def _read_train_data(cfg: NextConfig) -> hlp.Trainset:
     :returns A trainset containing the data for training and cross validation
     """
     cat_dict = hlp.category_dict()
+    price_dict = hlp.price_dict()
     df = cfg.df_base()
 
     df = df[df['month_nr'] < 33]
 
     df['cat'] = df['shop_id'].map(cat_dict)
+    df['price'] = df[['shop_id', 'item_id']].apply(lambda row: price_dict[(row['shop_id'], row['item_id'])], axis=1)
 
-    for oh in cfg.categorical_predictors:
-        df = hlp.onehot(df, oh)
+    for one_hot in cfg.categorical_predictors:
+        df = hlp.onehot(df, one_hot)
 
     df_x = df.drop(['cnt'], axis=1)
+
+    predictor_names = hlp.filter_variables(list(df_x.keys()), cfg.numeric_predictors + cfg.categorical_predictors)
+    df_x = df_x[predictor_names]
     df_y = df[['cnt']]
+
 
     if cfg.normalized:
         x_min_max_scaler = preprocessing.MinMaxScaler()
@@ -71,10 +71,6 @@ def _read_train_data(cfg: NextConfig) -> hlp.Trainset:
         return hlp.Trainset(f'next_{cfg.id}', x_scaled, y_scaled, y_min_max_scaler)
     else:
         return hlp.Trainset(f'next_{cfg.id}', df_x, df_y, None)
-
-
-def read_train_data_all() -> hlp.Trainset:
-    return _read_train_data(configs['all'])
 
 
 def read_train_data_l() -> hlp.Trainset:

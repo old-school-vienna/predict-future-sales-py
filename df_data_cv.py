@@ -151,6 +151,15 @@ run_configs = {
             NN('h_4L', 'relu', [1.0, 1,0]),
         ],
         trainset=ndat.read_train_data_karl_not_norm
+    ),
+    'small': RunConfig(
+        count_per_config=3,
+        epochs=5,
+        batch_size=10,
+        nns=[
+            NN('h_0L', 'relu', []),
+        ],
+        trainset=ndat.read_train_data_karl_not_norm
     )
 }
 
@@ -191,7 +200,7 @@ def cv(run_id: str, run_config: RunConfig):
 
     df_results = pd.DataFrame(dict(results))
 
-    fnam = hlp.dd() / 'cv' / f"cv_results_{run_id}.csv"
+    fnam = hlp.dd() / f"cv_results_{run_id}.csv"
     df_results.to_csv(fnam)
     print("-- wrote to", fnam)
 

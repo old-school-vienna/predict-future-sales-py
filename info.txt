@@ -20,7 +20,7 @@ docker run -d -v /home/wwagner4/prj/predict-future-sales-py:/opt/project \
 -v /home/wwagner4/data:/opt/data \
 -e DATADIR=/opt/data \
 -w /opt/project \
--name pfs
+--name pfs \
 gcr.io/skilful-boulder-294218/pfs python df_data_cv.py nn01
 
 

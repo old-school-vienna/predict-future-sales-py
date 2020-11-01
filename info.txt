@@ -20,9 +20,13 @@ docker run -d -v /home/wwagner4/prj/predict-future-sales-py:/opt/project \
 -v /home/wwagner4/data:/opt/data \
 -e DATADIR=/opt/data \
 -w /opt/project \
-predict-future-sales python df_data_cv.py nn01
+-name pfs
+gcr.io/skilful-boulder-294218/pfs python df_data_cv.py nn01
 
 
-# build
+## build
+# local
 docker build -t predict-future-sales .
 
+# google cloud
+docker build -t gcr.io/skilful-boulder-294218/pfs 

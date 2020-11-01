@@ -6,8 +6,8 @@ import matplotlib.pylab as plt
 
 
 def plot():
-    tid = 'nextkarl02a'
-    pattern = f"train_{tid}_.*json"
+    pattern = f"train.*json"
+    base_dir = hlp.dd() / 'nextkarl02b'
 
     def plot_json(json_file: Path):
         def plot_training(train_result: dict):
@@ -21,8 +21,8 @@ def plot():
             fig: plt.Figure = plt.figure()
             ax: plt.Axes = fig.subplots()
             ax.set_title(title)
-            ax.set_ylim(100, 500)
-            ax.set_yscale('log')
+            ax.set_ylim(100, 200)
+            ax.set_yscale('linear')
             for hist in histories:
                 ax.plot(hist)
 
@@ -35,7 +35,6 @@ def plot():
         with open(json_file) as f:
             plot_training(json.load(f))
 
-    base_dir = hlp.dd() / 'next02'
     files = [f for f in base_dir.iterdir() if re.match(pattern, f.name)]
     files = sorted(files, key=lambda f: f.name)
     [plot_json(f) for f in files]

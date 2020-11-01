@@ -97,6 +97,19 @@ configs = {
         activations=["relu", "tanh"],
         trainsets=[ndat.read_train_data_karl_not_norm],
     ),
+    'nextkarl02c': TrainConfig(
+        epochs=30,
+        iterations=4,
+        batch_sizes=[15, 20, 30],
+        layers_list=[
+            [],
+            [1.0],
+            [1.0, 1.0],
+            [1.0, 1.0, 1.0],
+        ],
+        activations=["relu"],
+        trainsets=[ndat.read_train_data_karl_not_norm],
+    ),
     'tryout': TrainConfig(
         epochs=5,
         iterations=2,
@@ -160,5 +173,5 @@ def train(train_id: str, train_config: TrainConfig):
 
 
 if __name__ == '__main__':
-    tid = 'nextkarl02b'
+    tid = 'nextkarl02c'
     train(tid, train_config=configs[tid])

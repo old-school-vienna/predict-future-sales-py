@@ -6,6 +6,7 @@ import sklearn.model_selection as ms
 
 import df_data_flat as fdat
 import df_data_struct as sdat
+import df_data_next as ndat
 import helpers as hlp
 
 import argparse as ap
@@ -137,6 +138,19 @@ run_configs = {
             NN('h_4L', 'relu', [0.7, 0.5, 0.2, 0.1]),
         ],
         trainset=sdat.read_train_data
+    ),
+    'nn01': RunConfig(
+        count_per_config=40,
+        epochs=5,
+        batch_size=10,
+        nns=[
+            NN('h_0L', 'relu', []),
+            NN('h_1L', 'relu', [0.5]),
+            NN('h_2L', 'relu', [1.0]),
+            NN('h_3L', 'relu', [0.5, 0.2]),
+            NN('h_4L', 'relu', [1.0, 1,0]),
+        ],
+        trainset=ndat.read_train_data_karl_not_norm
     )
 }
 

@@ -97,6 +97,8 @@ def plot():
                    ymin_log=0.00007, ymax_log=0.001, ymax_linear=0.0004),
         PlotConfig('s04', desc='data:struct compare NNs with different depth and small hidden layers',
                    ymin_log=0.00007, ymax_log=0.001, ymax_linear=0.0004),
+        PlotConfig('nn01', desc='not normalized',
+                   ymin_log=50, ymax_log=500, ymax_linear=500),
     ]
 
     for p in plots:

@@ -38,15 +38,23 @@ configs = {
 }
 
 
-def _read_train_data(cfg: NextConfig) -> hlp.Trainset:
+def _read_data(cfg: NextConfig, data_type: str) -> hlp.Trainset:
     """
+    data_type: 'train', 'train_subm', test_subm
     :returns A trainset containing the data for training and cross validation
     """
     cat_dict = hlp.category_dict()
     price_dict = hlp.price_dict()
     df = cfg.df_base()
 
-    df = df[df['month_nr'] < 33]
+    if data_type == 'train':
+        df = df[df['month_nr'] < 33]
+    elif data_type == 'train_subm':
+        df = df[df['month_nr'] < 34]
+    elif data_type == 'test_subm':
+        df = df[df['month_nr'] == 34]
+    else:
+        raise AttributeError(f"Illegal data_type '{data_type}'")
 
     df['cat'] = df['shop_id'].map(cat_dict)
     df['price'] = df[['shop_id', 'item_id']].apply(lambda row: price_dict[(row['shop_id'], row['item_id'])], axis=1)
@@ -73,20 +81,28 @@ def _read_train_data(cfg: NextConfig) -> hlp.Trainset:
 
 
 def read_train_data_l() -> hlp.Trainset:
-    return _read_train_data(configs['L'])
+    return _read_data(configs['L'], 'train')
 
 
 def read_train_data_m() -> hlp.Trainset:
-    return _read_train_data(configs['M'])
+    return _read_data(configs['M'], 'train')
 
 
 def read_train_data_s() -> hlp.Trainset:
-    return _read_train_data(configs['S'])
+    return _read_data(configs['S'], 'train')
 
 
 def read_train_data_karl() -> hlp.Trainset:
-    return _read_train_data(configs['karl'])
+    return _read_data(configs['karl'], 'train')
 
 
 def read_train_data_karl_not_norm() -> hlp.Trainset:
-    return _read_train_data(configs['karl_not_norm'])
+    return _read_data(configs['karl_not_norm'], 'train')
+
+
+def read_train_data_submission() -> hlp.Trainset:
+    return _read_data(configs['karl_not_norm'], 'train_subm')
+
+
+def read_test_data_submission() -> hlp.Trainset:
+    return _read_data(configs['karl_not_norm'], 'test_subm')

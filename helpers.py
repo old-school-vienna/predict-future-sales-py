@@ -80,6 +80,12 @@ def category_dict() -> Dict[int, int]:
     return pd.Series(df.item_category_id.values, index=df.item_id).to_dict()
 
 
+def read_test() -> pd.DataFrame:
+    file_name = dd() / 'in' / "test.csv"
+    return pd.read_csv(file_name)
+
+
+
 @dataclass
 class LayerConfig:
     size_relative: float

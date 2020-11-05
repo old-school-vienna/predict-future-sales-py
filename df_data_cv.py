@@ -148,7 +148,23 @@ run_configs = {
             NN('h_1L', 'relu', [0.5]),
             NN('h_2L', 'relu', [1.0]),
             NN('h_3L', 'relu', [0.5, 0.2]),
-            NN('h_4L', 'relu', [1.0, 1,0]),
+            NN('h_4L', 'relu', [1.0, 1.0]),
+        ],
+        trainset=ndat.read_train_data_karl_not_norm
+    ),
+    'nn02': RunConfig(
+        count_per_config=40,
+        epochs=5,
+        batch_size=10,
+        nns=[
+            NN('h_0', 'relu', []),
+            NN('h_1a', 'relu', [0.1]),
+            NN('h_1b', 'relu', [0.5]),
+            NN('h_1c', 'relu', [1.0]),
+            NN('h_3a', 'relu', [0.1, 0.1]),
+            NN('h_3b', 'relu', [0.3, 0.1]),
+            NN('h_3c', 'relu', [0.5, 0.1]),
+            NN('h_4d', 'relu', [1.0, 1.5]),
         ],
         trainset=ndat.read_train_data_karl_not_norm
     ),

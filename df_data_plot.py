@@ -21,56 +21,59 @@ class PlotConfig:
 
 def plot():
     def plot_id(plot_config: PlotConfig):
-        fnam = hlp.dd() / 'cv' / f"cv_results_{plot_config.run_id}.csv"
-        print("-- reading", fnam)
-        dat = pd.read_csv(fnam, index_col=0)
-        # print(dat.shape)
-        # print(dat.keys())
-        # print(dat.head())
+        fnam = hlp.dd() / f"cv_results_{plot_config.run_id}.csv"
+        if fnam.exists():
+            print("-- reading", fnam)
+            dat = pd.read_csv(fnam, index_col=0)
+            # print(dat.shape)
+            # print(dat.keys())
+            # print(dat.head())
 
-        fig: Figure = plt.figure()
-        fig.set_size_inches(15, 15)
-        fig.suptitle(f"cross validation run_id:{plot_config.run_id} \n{plot_config.desc}")
-        fig.tight_layout()
+            fig: Figure = plt.figure()
+            fig.set_size_inches(15, 15)
+            fig.suptitle(f"cross validation run_id:{plot_config.run_id} \n{plot_config.desc}")
+            fig.tight_layout()
 
-        axs = fig.subplots(ncols=2, nrows=2)
+            axs = fig.subplots(ncols=2, nrows=2)
 
-        ax: Axes = axs[0][0]
-        ax.set_yscale('log')
-        ax.set_ylim(plot_config.ymin_log, plot_config.ymax_log)
-        ax.violinplot(dat, showmeans=True)
-        ax.set_xticks(range(1, len(dat.keys()) + 1))
-        ax.set_xticklabels(dat.keys())
-        ax.tick_params(axis='x', labelrotation=45.0)
+            ax: Axes = axs[0][0]
+            ax.set_yscale('log')
+            ax.set_ylim(plot_config.ymin_log, plot_config.ymax_log)
+            ax.violinplot(dat, showmeans=True)
+            ax.set_xticks(range(1, len(dat.keys()) + 1))
+            ax.set_xticklabels(dat.keys())
+            ax.tick_params(axis='x', labelrotation=45.0)
 
-        ax: Axes = axs[0][1]
-        ax.set_yscale('log')
-        ax.set_ylim(plot_config.ymin_log, plot_config.ymax_log)
-        ax.boxplot(dat)
-        ax.set_xticks(range(1, len(dat.keys()) + 1))
-        ax.set_xticklabels(dat.keys())
-        ax.tick_params(axis='x', labelrotation=45.0)
+            ax: Axes = axs[0][1]
+            ax.set_yscale('log')
+            ax.set_ylim(plot_config.ymin_log, plot_config.ymax_log)
+            ax.boxplot(dat)
+            ax.set_xticks(range(1, len(dat.keys()) + 1))
+            ax.set_xticklabels(dat.keys())
+            ax.tick_params(axis='x', labelrotation=45.0)
 
-        ax: Axes = axs[1][0]
-        ax.set_yscale('linear')
-        ax.set_ylim(plot_config.ymin_linear, plot_config.ymax_linear)
-        ax.violinplot(dat, showmeans=True)
-        ax.set_xticks(range(1, len(dat.keys()) + 1))
-        ax.set_xticklabels(dat.keys())
-        ax.tick_params(axis='x', labelrotation=45.0)
+            ax: Axes = axs[1][0]
+            ax.set_yscale('linear')
+            ax.set_ylim(plot_config.ymin_linear, plot_config.ymax_linear)
+            ax.violinplot(dat, showmeans=True)
+            ax.set_xticks(range(1, len(dat.keys()) + 1))
+            ax.set_xticklabels(dat.keys())
+            ax.tick_params(axis='x', labelrotation=45.0)
 
-        ax: Axes = axs[1][1]
-        ax.set_yscale('linear')
-        ax.set_ylim(plot_config.ymin_linear, plot_config.ymax_linear)
-        ax.boxplot(dat)
-        ax.set_xticks(range(1, len(dat.keys()) + 1))
-        ax.set_xticklabels(dat.keys())
-        ax.tick_params(axis='x', labelrotation=45.0)
+            ax: Axes = axs[1][1]
+            ax.set_yscale('linear')
+            ax.set_ylim(plot_config.ymin_linear, plot_config.ymax_linear)
+            ax.boxplot(dat)
+            ax.set_xticks(range(1, len(dat.keys()) + 1))
+            ax.set_xticklabels(dat.keys())
+            ax.tick_params(axis='x', labelrotation=45.0)
 
-        fnam = hlp.dd() / 'cv' / f"cv_plot_{plot_config.run_id}.svg"
-        fig.savefig(fnam)
+            fnam = hlp.dd() / f"cv_plot_{plot_config.run_id}.svg"
+            fig.savefig(fnam)
 
-        print("-- wrote to", fnam)
+            print("-- wrote to", fnam)
+        else:
+            print("-- not found", fnam)
 
     plots = [
         PlotConfig('x', desc='data:flat act:relu compare NNs with different complexity'),
@@ -98,6 +101,8 @@ def plot():
         PlotConfig('s04', desc='data:struct compare NNs with different depth and small hidden layers',
                    ymin_log=0.00007, ymax_log=0.001, ymax_linear=0.0004),
         PlotConfig('nn01', desc='not normalized',
+                   ymin_log=50, ymax_log=500, ymax_linear=500),
+        PlotConfig('nn02', desc='not normalized',
                    ymin_log=50, ymax_log=500, ymax_linear=500),
     ]
 

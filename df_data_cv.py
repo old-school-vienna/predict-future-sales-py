@@ -189,7 +189,7 @@ run_configs = {
             NN('h_4c', 'relu', [1.0, 0.5, 0.3]),
             NN('h_4d', 'relu', [1.0, 1.0, 1.0]),
         ],
-        trainset=ndat.read_train_data_karl_not_norm
+        trainset=ndat.read_train_data_karl_not_hot()
     ),
     'small': RunConfig(
         count_per_config=3,
@@ -198,7 +198,7 @@ run_configs = {
         nns=[
             NN('h_0L', 'relu', []),
         ],
-        trainset=ndat.read_train_data_karl_not_norm
+        trainset=ndat.read_train_data_karl
     )
 }
 

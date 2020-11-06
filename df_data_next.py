@@ -34,7 +34,12 @@ configs = {
                                 categorical_predictors=['cat', 'month_nr', 'monthgroup', 'qtr', 'shop_id', 'year'],
                                 numeric_predictors=["cnt1", "cnt2", "cnt3", "cnt4", "cnt5", "cnt6", "cnt_3m", "cnt_6m",
                                                     "cnt_shop1", "cnt_shop_3m", "cnt_item1", "cnt_item_3m", "price", ],
-                                normalized=False)
+                                normalized=False),
+    'karl_not_hot': NextConfig(id='karl_not_norm', df_base=hlp.read_trainx_fillna,
+                               categorical_predictors=['cat', 'monthgroup', 'qtr', 'shop_id'],
+                               numeric_predictors=['year' 'month_nr'"cnt1", "cnt2", "cnt3", "cnt4", "cnt5", "cnt6", "cnt_3m", "cnt_6m",
+                                                   "cnt_shop1", "cnt_shop_3m", "cnt_item1", "cnt_item_3m", "price", ],
+                               normalized=False)
 }
 
 
@@ -96,7 +101,11 @@ def read_train_data_karl() -> hlp.Trainset:
     return _read_data(configs['karl'], 'train')
 
 
-def read_train_data_karl_not_norm() -> hlp.Trainset:
+def read_train_data_karl_not_hot() -> hlp.Trainset:
+    return _read_data(configs['karl_not_hot'], 'train')
+
+
+def read_train_data_karl_() -> hlp.Trainset:
     return _read_data(configs['karl_not_norm'], 'train')
 
 
@@ -106,3 +115,4 @@ def read_train_data_submission() -> hlp.Trainset:
 
 def read_test_data_submission() -> hlp.Trainset:
     return _read_data(configs['karl_not_norm'], 'test_subm')
+

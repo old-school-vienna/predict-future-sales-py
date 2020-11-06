@@ -104,6 +104,8 @@ def plot():
                    ymin_log=50, ymax_log=500, ymax_linear=500),
         PlotConfig('nn02', desc='not normalized',
                    ymin_log=50, ymax_log=500, ymax_linear=500),
+        PlotConfig('nn03', desc='not normalized',
+                   ymin_log=50, ymax_log=500, ymax_linear=500),
     ]
 
     for p in plots:

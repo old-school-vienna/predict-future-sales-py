@@ -2,7 +2,7 @@
 docker run -d -v /home/wwagner4/prj/kaggle/predict-future-sales-py:/opt/project \
 -e DATADIR=/opt/project/data \
 -w /opt/project \
-predict-future-sales python df_data_cv.py nn01
+predict-future-sales python df_data_cv.py nh01
 
 docker run -it -v /home/wwagner4/prj/kaggle/predict-future-sales-py:/opt/project \
 -e DATADIR=/opt/project/data \

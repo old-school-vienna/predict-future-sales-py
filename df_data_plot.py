@@ -1,21 +1,26 @@
 from dataclasses import dataclass
+from typing import List
 
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 
-import helpers as hlp
 import df_data_cv as dcv
+import helpers as hlp
+
+
+@dataclass
+class PlotScale:
+    scale: str
+    ymin: float
+    ymax: float
 
 
 @dataclass
 class PlotConfig:
     run_id: str
-    ymin_log: float = 0.000001
-    ymax_log: float = 0.1
-    ymin_linear: float = 0
-    ymax_linear: float = 0.001
+    plot_scales: List[PlotScale]
     desc: str = ''
 
 
@@ -29,44 +34,37 @@ def plot():
             # print(dat.keys())
             # print(dat.head())
 
+            subcnt = len(plot_config.plot_scales)
             fig: Figure = plt.figure()
-            fig.set_size_inches(15, 15)
+            fig.set_size_inches(16, 8 * subcnt)
             fig.suptitle(f"cross validation run_id:{plot_config.run_id} \n{plot_config.desc}")
             fig.tight_layout()
 
-            axs = fig.subplots(ncols=2, nrows=2)
+            axs = fig.subplots(ncols=2, nrows=subcnt)
+            for i in range(0, subcnt):
+                ps: PlotScale = plot_config.plot_scales[i]
 
-            ax: Axes = axs[0][0]
-            ax.set_yscale('log')
-            ax.set_ylim(plot_config.ymin_log, plot_config.ymax_log)
-            ax.violinplot(dat, showmeans=True)
-            ax.set_xticks(range(1, len(dat.keys()) + 1))
-            ax.set_xticklabels(dat.keys())
-            ax.tick_params(axis='x', labelrotation=45.0)
+                if subcnt == 1:
+                    ax: Axes = axs[0]
+                else:
+                    ax: Axes = axs[i][0]
+                ax.set_yscale(ps.scale)
+                ax.set_ylim(ps.ymin, ps.ymax)
+                ax.violinplot(dat, showmeans=True)
+                ax.set_xticks(range(1, len(dat.keys()) + 1))
+                ax.set_xticklabels(dat.keys())
+                ax.tick_params(axis='x', labelrotation=45.0)
 
-            ax: Axes = axs[0][1]
-            ax.set_yscale('log')
-            ax.set_ylim(plot_config.ymin_log, plot_config.ymax_log)
-            ax.boxplot(dat)
-            ax.set_xticks(range(1, len(dat.keys()) + 1))
-            ax.set_xticklabels(dat.keys())
-            ax.tick_params(axis='x', labelrotation=45.0)
-
-            ax: Axes = axs[1][0]
-            ax.set_yscale('linear')
-            ax.set_ylim(plot_config.ymin_linear, plot_config.ymax_linear)
-            ax.violinplot(dat, showmeans=True)
-            ax.set_xticks(range(1, len(dat.keys()) + 1))
-            ax.set_xticklabels(dat.keys())
-            ax.tick_params(axis='x', labelrotation=45.0)
-
-            ax: Axes = axs[1][1]
-            ax.set_yscale('linear')
-            ax.set_ylim(plot_config.ymin_linear, plot_config.ymax_linear)
-            ax.boxplot(dat)
-            ax.set_xticks(range(1, len(dat.keys()) + 1))
-            ax.set_xticklabels(dat.keys())
-            ax.tick_params(axis='x', labelrotation=45.0)
+                if subcnt == 1:
+                    ax: Axes = axs[1]
+                else:
+                    ax: Axes = axs[i][1]
+                ax.set_yscale(ps.scale)
+                ax.set_ylim(ps.ymin, ps.ymax)
+                ax.boxplot(dat)
+                ax.set_xticks(range(1, len(dat.keys()) + 1))
+                ax.set_xticklabels(dat.keys())
+                ax.tick_params(axis='x', labelrotation=45.0)
 
             fnam = hlp.dd() / f"cv_plot_{plot_config.run_id}.svg"
             fig.savefig(fnam)
@@ -75,39 +73,70 @@ def plot():
         else:
             print("-- not found", fnam)
 
+    default_plot_scales = [
+        PlotScale(
+            scale='linear',
+            ymin=0,
+            ymax=0.001,
+        ),
+        PlotScale(
+            scale='log',
+            ymin=0.000001,
+            ymax=0.1,
+        ),
+    ]
+
+    rel1_plot_scales = [
+        PlotScale(
+            scale='linear',
+            ymin=0,
+            ymax=0.00041,
+        ),
+        PlotScale(
+            scale='log',
+            ymin=0.00007,
+            ymax=0.01,
+        ),
+    ]
+
+    norm_plot_scales = [
+        PlotScale(
+            scale='linear',
+            ymin=100,
+            ymax=800,
+        ),
+    ]
+
     plots = [
-        PlotConfig('x', desc='data:flat act:relu compare NNs with different complexity'),
-        PlotConfig('01', desc='data:flat compare relu(r) and tanh(t) activation'),
-        PlotConfig('02', desc='data:flat act:relu'),
-        PlotConfig('03', desc='data:flat compare NNs with very small hidden layers'),
-        PlotConfig('04', desc='data:flat compare NNs with very small hidden layers'),
-        PlotConfig('08', desc='data:flat compare NNs with different depth'),
-        PlotConfig('09', desc='data:flat compare NNs with different depth'),
+        PlotConfig('x', desc='data:flat act:relu compare NNs with different complexity',
+                   plot_scales=default_plot_scales),
+        PlotConfig('01', desc='data:flat compare relu(r) and tanh(t) activation', plot_scales=default_plot_scales),
+        PlotConfig('02', desc='data:flat act:relu', plot_scales=default_plot_scales),
+        PlotConfig('03', desc='data:flat compare NNs with very small hidden layers', plot_scales=default_plot_scales),
+        PlotConfig('04', desc='data:flat compare NNs with very small hidden layers', plot_scales=default_plot_scales),
+        PlotConfig('08', desc='data:flat compare NNs with different depth', plot_scales=default_plot_scales),
+        PlotConfig('09', desc='data:flat compare NNs with different depth', plot_scales=default_plot_scales),
         PlotConfig('struct_01', desc='data:struct compare NNs with different depth 0 - 5',
-                   ymin_log=0.00007, ymax_log=0.001, ymax_linear=0.0004),
+                   plot_scales=rel1_plot_scales),
         PlotConfig('struct_02',
                    desc='data:struct compare NNs with different depth 0 - 10 and size of hidden layers (L, M, S)',
-                   ymin_log=0.00007, ymax_log=0.001, ymax_linear=0.0004),
+                   plot_scales=rel1_plot_scales),
         PlotConfig('struct_02a',
                    desc=dcv.run_configs['struct_02a'].description,
-                   ymin_log=0.00007, ymax_log=0.001, ymax_linear=0.0004),
+                   plot_scales=rel1_plot_scales),
         PlotConfig('struct_02b',
                    desc=dcv.run_configs['struct_02b'].description,
-                   ymin_log=0.00007, ymax_log=0.001, ymax_linear=0.0004),
+                   plot_scales=rel1_plot_scales),
         PlotConfig('s02', desc='data:struct compare NNs with different depth 0 - 3',
-                   ymin_log=0.00007, ymax_log=0.001, ymax_linear=0.0004),
+                   plot_scales=rel1_plot_scales),
         PlotConfig('s03', desc='data:struct compare NNs with different depth 0 - 4',
-                   ymin_log=0.00007, ymax_log=0.001, ymax_linear=0.0004),
+                   plot_scales=rel1_plot_scales),
         PlotConfig('s04', desc='data:struct compare NNs with different depth and small hidden layers',
-                   ymin_log=0.00007, ymax_log=0.001, ymax_linear=0.0004),
-        PlotConfig('nn01', desc='not normalized',
-                   ymin_log=50, ymax_log=500, ymax_linear=500),
-        PlotConfig('nn02', desc='not normalized',
-                   ymin_log=50, ymax_log=500, ymax_linear=500),
-        PlotConfig('nn03', desc='not normalized',
-                   ymin_log=50, ymax_log=500, ymax_linear=500),
-        PlotConfig('nh01', desc='not normalized/hot',
-                   ymin_log=50, ymax_log=500, ymin_linear=100, ymax_linear=500),
+                   plot_scales=rel1_plot_scales),
+        PlotConfig('nn01', desc='not normalized 1', plot_scales=norm_plot_scales),
+        PlotConfig('nn02', desc='not normalized 2', plot_scales=norm_plot_scales),
+        PlotConfig('nn03', desc='not normalized 3', plot_scales=norm_plot_scales),
+        PlotConfig('nh01', desc='not normalized/hot 1', plot_scales=norm_plot_scales),
     ]
 
     for p in plots:

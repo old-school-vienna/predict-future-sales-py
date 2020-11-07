@@ -191,7 +191,7 @@ run_configs = {
         ],
         trainset=ndat.read_train_data_karl_not_hot
     ),
-    'nh01': RunConfig(
+    'nh01a': RunConfig(
         count_per_config=40,
         epochs=5,
         batch_size=10,
@@ -274,3 +274,4 @@ if __name__ == '__main__':
     else:
         known = ','.join([i for i in run_configs.keys()])
         print(f"Unknown run_id '{ri}'. ({known})")
+     

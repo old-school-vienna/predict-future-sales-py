@@ -50,7 +50,7 @@ def read_train_data() -> hlp.Trainset:
         df = df_base.copy()
         df = df[df['month_nr'] < 33]
 
-        df['cat'] = df['shop_id'].map(cat_dict)
+        df['cat'] = df['item_id'].map(cat_dict)
         cats = df['cat']
         dummy_cats = pd.get_dummies(cats, prefix="cat")
         df = dummy_cats.join(df)

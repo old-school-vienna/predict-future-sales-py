@@ -62,7 +62,7 @@ def _read_data(cfg: NextConfig, data_type: str) -> hlp.Trainset:
     else:
         raise AttributeError(f"Illegal data_type '{data_type}'")
 
-    df['cat'] = df['shop_id'].map(cat_dict)
+    df['cat'] = df['item_id'].map(cat_dict)
     df['price'] = df[['shop_id', 'item_id']].apply(lambda row: price_dict[(row['shop_id'], row['item_id'])], axis=1)
 
     for one_hot in cfg.categorical_predictors:

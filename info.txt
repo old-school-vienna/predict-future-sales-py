@@ -2,17 +2,20 @@
 docker run -d -v /home/wwagner4/prj/kaggle/predict-future-sales-py:/opt/project \
 -e DATADIR=/opt/project/data \
 -w /opt/project \
-predict-future-sales python df_data_cv.py nh01
+--name pfs \
+predict-future-sales python df_data_cv.py nh01a
 
 docker run -it -v /home/wwagner4/prj/kaggle/predict-future-sales-py:/opt/project \
 -e DATADIR=/opt/project/data \
 -w /opt/project \
+--name pfs \
 predict-future-sales bash
 
 # work
 docker run -it -v /home/itsv.org.sv-services.at/31100428/prj/kaggle/predict-future-sales-py:/opt/project \
 -e DATADIR=/opt/project/data \
 -w /opt/project \
+--name pfs \
 predict-future-sales python df_data_cv.py nn03
 predict-future-sales python df_data_cv.py small
 predict-future-sales python df_data_cv.py nn01

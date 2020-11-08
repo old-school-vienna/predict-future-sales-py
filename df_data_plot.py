@@ -137,6 +137,7 @@ def plot():
         PlotConfig('nn02', desc='not normalized 2', plot_scales=norm_plot_scales),
         PlotConfig('nn03', desc='not normalized 3', plot_scales=norm_plot_scales),
         PlotConfig('nh01', desc='not normalized/hot 1', plot_scales=norm_plot_scales),
+        PlotConfig('nh01a', desc='not normalized/hot 1 fix category', plot_scales=norm_plot_scales),
     ]
 
     for p in plots:

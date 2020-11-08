@@ -49,27 +49,30 @@ def _read_data(cfg: NextConfig, data_type: str) -> hlp.Trainset:
     data_type: 'train', 'train_subm', test_subm
     :returns A trainset containing the data for training and cross validation
     """
+
     cat_dict = hlp.category_dict()
     price_dict = hlp.price_dict()
     df = cfg.df_base()
 
     if data_type == 'train':
-        df = df[df['month_nr'] < 33]
+        df['relevant'] = df['month_nr'] < 33
     elif data_type == 'train_subm':
-        df = df[df['month_nr'] < 34]
+        df['relevant'] = df['month_nr'] < 34
     elif data_type == 'test_subm':
-        df = df[df['month_nr'] == 34]
+        df['relevant'] = df['month_nr'] == 34
     else:
         raise AttributeError(f"Illegal data_type '{data_type}'")
 
     df['cat'] = df['item_id'].map(cat_dict)
     df['price'] = df[['shop_id', 'item_id']].apply(lambda row: price_dict[(row['shop_id'], row['item_id'])], axis=1)
-
     for one_hot in cfg.categorical_predictors:
         df = hlp.onehot(df, one_hot)
 
     df_x = df.drop(['cnt'], axis=1)
 
+    # Filter relevant and remove 'relevant' column
+    df.drop(columns=['relevant'], axis=1)
+    df = df[df['relevant']]
     predictor_names = hlp.filter_variables(list(df_x.keys()), cfg.numeric_predictors + cfg.categorical_predictors)
     df_x = df_x[predictor_names]
     df_y = df[['cnt']]

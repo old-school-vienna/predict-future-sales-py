@@ -33,5 +33,38 @@ gcr.io/skilful-boulder-294218/pfs python df_data_cv.py nn01
 # local
 docker build -t predict-future-sales .
 
+
+
+
 # google cloud
 docker build -t gcr.io/skilful-boulder-294218/pfs 
+
+docker run -d -v /home/wwagner4/prj/predict-future-sales-py:/opt/project \
+-v /home/wwagner4/data:/opt/data \
+-e DATADIR=/opt/data \
+-w /opt/project \
+--name pfs \
+gcr.io/skilful-boulder-294218/pfs python df_data_cv.py nn01b
+
+
+
+
+vm zone: us-central1-a 
+
+PROJECT_ID              NAME                  PROJECT_NUMBER
+skilful-boulder-294218  predict-future-sales  1083762175730
+
+
+gcloud compute project-info add-metadata \
+   --metadata=[google-compute-default-region=us-central1-a | google-compute-default-zone=us-central1-a]
+   
+gcloud config get-value compute/region
+gcloud config get-value compute/zone
+
+gcloud init
+
+
+   
+   
+
+

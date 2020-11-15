@@ -31,11 +31,18 @@ def basic_tests():
 
 
 def subm():
-    _ts_train = ndat.read_train_data_submission()
-    _ts_test = ndat.read_test_data_submission()
+    ts_train = ndat.read_train_data_submission()
 
-    print("train:", _ts_train.id, _ts_train.x.shape, _ts_train.y.shape)
-    print("test: ", _ts_test.id, _ts_test.x.shape, _ts_test.y.shape)
+    print("train :", ts_train.id, ts_train.x.shape, ts_train.y.shape)
+
+    mcfg = hlp.ModelConfig(activation='relu', optimizer='adam', loss='mean_squared_error', layers=[])
+    model = hlp.create_model(mcfg, ts_train.x.shape[1])
+    hist = model.fit(ts_train.x, ts_train.y, batch_size=10, epochs=6)
+    print("=============== finished training ===============")
+    print(hist.history['loss'])
+
+    ts_test = ndat.read_test_data_submission()
+    print("test  : ", ts_test.id, ts_test.x.shape, ts_test.y.shape)
 
 
 if __name__ == '__main__':

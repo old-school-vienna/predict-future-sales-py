@@ -85,25 +85,19 @@ def read_test() -> pd.DataFrame:
     return pd.read_csv(file_name)
 
 
-
-@dataclass
-class LayerConfig:
-    size_relative: float
-
-
 @dataclass
 class ModelConfig:
     activation: str
     optimizer: str
     loss: str
-    layers: typing.List[LayerConfig]
+    layers: typing.List[float]
 
 
 def create_model(model_config: ModelConfig, input_size: int):
     model = keras.Sequential()
     model.add(kerasl.Dense(input_size, activation=model_config.activation))
-    for layer in model_config.layers:
-        model.add(kerasl.Dense(int(layer.size_relative * input_size), activation=model_config.activation))
+    for size_relative in model_config.layers:
+        model.add(kerasl.Dense(int(size_relative * input_size), activation=model_config.activation))
     model.add(kerasl.Dense(1))
     model.compile(optimizer=model_config.optimizer, loss=model_config.loss)
     return model

@@ -238,9 +238,8 @@ def cv(run_id: str, run_config: RunConfig):
         print("-- x test", x_test.shape)
         print("-- y test", y_test.shape)
 
-        layer_configs = [hlp.LayerConfig(size) for size in nn.layers]
         model_config = hlp.ModelConfig(activation=nn.activation, optimizer='adam',
-                                       loss='mean_squared_error', layers=layer_configs)
+                                       loss='mean_squared_error', layers=nn.layers)
         model = hlp.create_model(model_config, x_train.shape[1])
         history = model.fit(x_train, y_train, epochs=run_config.epochs, batch_size=run_config.batch_size)
         for loss in history.history['loss']:
@@ -274,4 +273,3 @@ if __name__ == '__main__':
     else:
         known = ','.join([i for i in run_configs.keys()])
         print(f"Unknown run_id '{ri}'. ({known})")
-     

@@ -2,8 +2,6 @@ import typing
 from dataclasses import dataclass
 import json
 
-import matplotlib.pyplot as plt
-
 import df_data_next as ndat
 import helpers as hlp
 
@@ -157,9 +155,8 @@ def train(train_id: str, train_config: TrainConfig):
                     print("-- Trainset", ts.id)
                     complexity = len(layers)
                     print("-- NN", complexity)
-                    layer_configs = [hlp.LayerConfig(size) for size in layers]
                     model_config = hlp.ModelConfig(activation=activation, optimizer='adam',
-                                                   loss='mean_squared_error', layers=layer_configs)
+                                                   loss='mean_squared_error', layers=layers)
                     input_size = ts.x.shape[1]
                     model = DeepModel(f'{activation}_{complexity}', lambda: hlp.create_model(model_config, input_size))
                     training = Training(id=f'{train_id}_bs{batch_size}', batch_size=batch_size,
